@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { getTrendingMovies } from "./services/tmdb";
+import MovieCard from "./components/MovieCard";
 
 function App() {
   const [movies, setMovies] = useState([]);
@@ -23,23 +24,10 @@ function App() {
 
       <div style={{ display: "flex", flexWrap: "wrap", gap: 10 }}>
         {movies.map((movie) => (
-          <div
+          <MovieCard
             key={movie.id}
-            style={{
-              width: 150,
-              border: "1px solid #ccc",
-              borderRadius: 8,
-              padding: 10,
-            }}
-          >
-            <img
-              src={`https://image.tmdb.org/t/p/w200${movie.poster_path}`}
-              alt={movie.title}
-              style={{ width: "100%" }}
-            />
-
-            <p style={{ fontSize: 12 }}>{movie.title}</p>
-          </div>
+            movie={movie}
+          />
         ))}
       </div>
     </div>
