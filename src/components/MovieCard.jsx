@@ -1,4 +1,16 @@
+import { useNavigate } from "react-router-dom";
+import { getFavorites, saveFavorites } from "../services/favorites";
+import { useState, useEffect } from "react";
+
 function MovieCard({ movie }) {
+    const navigate = useNavigate();
+    const [isFav, setIsFav] = useState(false);
+    const [hover, setHover] = useState(false);
+
+    useEffect(() => {
+        const favs = getFavorites();
+        setIsFav(favs.some((m) => m.id === movie.id));
+    }, [movie.id]);
 
     const releaseYear = movie.release_date
         ? movie.release_date.split("-")[0]
@@ -11,9 +23,27 @@ function MovieCard({ movie }) {
         return "red";
     }
 
+    function toggleFavorite(e) {
+    e.stopPropagation(); // blok navigate
+
+    let favs = getFavorites();
+
+    if (favs.some((m) => m.id === movie.id)) {
+        favs = favs.filter((m) => m.id !== movie.id);
+        setIsFav(false);
+    } else {
+        favs.push(movie);
+        setIsFav(true);
+    }
+
+        saveFavorites(favs);
+    }
+
     return (
     <div
+        onClick={() => navigate(`/movie/${movie.id}`)}
         style={{
+            position: "relative",
             width: 180,
             border: "1px solid #ddd",
             borderRadius: 12,
@@ -22,6 +52,7 @@ function MovieCard({ movie }) {
             boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
             backgroundColor: "white",
             transition: "transform 0.2s ease, box-shadow 0.2s ease",
+            cursor: "pointer"
         }}
 
         onMouseEnter={(e) => {
@@ -34,16 +65,36 @@ function MovieCard({ movie }) {
           e.currentTarget.style.boxShadow = "0 2px 8px rgba(0,0,0,0.1)";
         }}
     >
-        <img
-            src={`https://image.tmdb.org/t/p/w200${movie.poster_path}`}
-            alt={movie.title}
-            style={{ 
-                width: "100%",
-                height: 270,
-                objectFit: "cover",
-            }}
-        />
-
+        <div style={{ position: "relative" }}>
+            <img
+                src={`https://image.tmdb.org/t/p/w200${movie.poster_path}`}
+                alt={movie.title}
+                style={{ 
+                    width: "100%",
+                    height: 270,
+                    objectFit: "cover",
+                }}
+            />
+            {/* ❤️ BUTTON */}
+            <div
+                onClick={toggleFavorite}
+                style={{
+                    position: "absolute",
+                    top: 8,
+                    right: 8,
+                    fontSize: 22,
+                    cursor: "pointer",
+                    zIndex: 2,
+                    color: isFav ? "red" : "white",
+                    opacity: isFav ? 1 : 0.6,
+                    transition: "opacity 0.2s, transform 0.2s",
+                    transform: hover ? "scale(1.15)" : "scale(1)",
+                    textShadow: "0 0 6px rgba(0,0,0,0.9)"
+                }}
+            >
+                {isFav ? "❤️" : "🤍"}
+            </div>
+        </div>
         <div style={{ padding: 10 }}>
             <p style={{ fontSize: 16, color: "black", marginBottom: 8, fontWeight: "bold", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{movie.title}</p>
             <p style={{ 
