@@ -22,7 +22,15 @@ function App() {
     <div style={{ padding: 20 }}>
       <h1>🎬 Trending Movies</h1>
 
-      <div style={{ display: "flex", flexWrap: "wrap", gap: 10 }}>
+      <div 
+        style={{ 
+          display: "grid",
+          gridTemplateColumns: "repeat(auto-fill, minmax(180px, 1fr))",
+          gap: 10,
+          marginTop: 20,
+          justifyItems: "center", 
+        }}
+      >
         {movies.map((movie) => (
           <MovieCard
             key={movie.id}
