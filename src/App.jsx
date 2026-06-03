@@ -1,26 +1,57 @@
 import { useEffect, useState } from "react";
-import { getTrendingMovies } from "./services/tmdb";
+import { getTrendingMovies, searchMovies } from "./services/tmdb";
 import MovieCard from "./components/MovieCard";
 
 function App() {
   const [movies, setMovies] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [query, setQuery] = useState("");
+  const [searchTerm, setSearchTerm] = useState("");
 
   useEffect(() => {
-    async function loadMovies() {
-      const data = await getTrendingMovies();
-      setMovies(data.results);
-      setLoading(false);
-    }
-
     loadMovies();
   }, []);
 
   if (loading) return <p>Loading movies...</p>;
 
+  async function loadMovies(searchQuery = "") {
+    setLoading(true);
+
+    let data;
+
+    if (searchQuery.trim()) {
+      data = await searchMovies(query);
+      setSearchTerm(searchQuery);
+    } else {
+      data = await getTrendingMovies();
+       setSearchTerm("");
+    }
+
+    setMovies(data.results || []);
+    setLoading(false);
+  }
+
   return (
     <div style={{ padding: 20 }}>
-      <h1>🎬 Trending Movies</h1>
+      <h1>
+        {searchTerm
+          ? `Search results for "${searchTerm}"`
+          : "🎬 Trending Movies"}
+      </h1>
+
+      <input
+        value={query}
+        onChange={(e) => setQuery(e.target.value)}
+        onKeyDown={(e) => {
+          if (e.key === "Enter") {
+            loadMovies(query);
+          }
+        }}
+        placeholder="Search movies..."
+      />
+      <button onClick={() => loadMovies(query)}>
+        Search
+      </button>
 
       <div 
         style={{ 

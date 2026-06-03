@@ -7,3 +7,10 @@ export async function getTrendingMovies() {
   );
   return res.json();
 }
+
+export async function searchMovies(query) {
+  const res = await fetch(
+    `${BASE_URL}/search/movie?query=${query}&api_key=${API_KEY}`
+  );
+  return res.json();
+}
