@@ -12,6 +12,7 @@ function Home() {
   const [searchTerm, setSearchTerm] = useState("");
   const { favorites } = useFavorites();
   const navigate = useNavigate();
+  const [sortBy, setSortBy] = useState("popularity");
 
   useEffect(() => {
     loadMovies();
@@ -33,6 +34,23 @@ function Home() {
     setMovies(data.results || []);
     setLoading(false);
   }
+
+  const sortedMovies = [...movies].sort((a, b) => {
+    switch (sortBy) {
+      case "rating":
+        return b.vote_average - a.vote_average;
+
+      case "release":
+        return new Date(b.release_date) - new Date(a.release_date);
+
+      case "title":
+        return a.title.localeCompare(b.title);
+
+      case "popularity":
+      default:
+        return b.popularity - a.popularity;
+    }
+  });
 
   return (
     <div style={{ padding: 20 }}>
@@ -83,6 +101,20 @@ function Home() {
         Search
       </button>
 
+      <select
+        value={sortBy}
+        onChange={(e) => setSortBy(e.target.value)}
+        style={{
+            marginLeft: 10,
+            padding: "8px",
+        }}
+      >
+        <option value="popularity">Popularity</option>
+        <option value="rating">Rating</option>
+        <option value="release">Release Date</option>
+        <option value="title">Title A-Z</option>
+      </select>
+
       <div
         style={{
           display: "grid",
@@ -97,7 +129,7 @@ function Home() {
           ? Array.from({ length: 20 }).map((_, index) => (
               <SkeletonCard key={index} />
             ))
-          : movies.map((movie) => (
+          : sortedMovies.map((movie) => (
               <MovieCard key={movie.id} movie={movie} />
         ))}
       </div>
