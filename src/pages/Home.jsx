@@ -3,13 +3,14 @@ import { getTrendingMovies, searchMovies } from "../services/tmdb";
 import MovieCard from "../components/MovieCard";
 import SkeletonCard from "../components/SkeletonCard";
 import { useNavigate } from "react-router-dom";
-import { getFavorites } from "../services/favorites";
+import { useFavorites } from "../context/FavoritesContext";
 
 function Home() {
   const [movies, setMovies] = useState([]);
   const [loading, setLoading] = useState(true);
   const [query, setQuery] = useState("");
   const [searchTerm, setSearchTerm] = useState("");
+  const { favorites } = useFavorites();
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -63,7 +64,7 @@ function Home() {
             boxShadow: "0 4px 12px rgba(0,0,0,0.2)"
         }}
       >
-        ❤️ Favorites ({getFavorites().length})
+        ❤️ Favorites ({favorites.length})
       </button>
 
       {/* SEARCH */}

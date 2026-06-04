@@ -5,14 +5,10 @@ import { useFavorites } from "../context/FavoritesContext";
 
 function MovieCard({ movie }) {
     const navigate = useNavigate();
-    const [isFav, setIsFav] = useState(false);
     const [hover, setHover] = useState(false);
+    const { isFavorite, toggleFavorite } = useFavorites();
 
-    useEffect(() => {
-        const favs = getFavorites();
-        setIsFav(favs.some((m) => m.id === movie.id));
-    }, [movie.id]);
-
+    const isFav = isFavorite(movie.id);
     const releaseYear = movie.release_date
         ? movie.release_date.split("-")[0]
         : "N/A";
@@ -24,21 +20,10 @@ function MovieCard({ movie }) {
         return "red";
     }
 
-    function toggleFavorite(e) {
-    e.stopPropagation(); // blok navigate
-
-    let favs = getFavorites();
-
-    if (favs.some((m) => m.id === movie.id)) {
-        favs = favs.filter((m) => m.id !== movie.id);
-        setIsFav(false);
-    } else {
-        favs.push(movie);
-        setIsFav(true);
-    }
-
-        saveFavorites(favs);
-    }
+    const handleToggleFavorite = (e) => {
+        e.stopPropagation(); // blok navigate
+        toggleFavorite(movie);
+    };
 
     return (
     <div
@@ -78,7 +63,7 @@ function MovieCard({ movie }) {
             />
             {/* ❤️ BUTTON */}
             <div
-                onClick={toggleFavorite}
+                onClick={handleToggleFavorite}
                 style={{
                     position: "absolute",
                     top: 8,
