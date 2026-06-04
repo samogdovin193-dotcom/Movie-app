@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { getTrendingMovies, searchMovies } from "../services/tmdb";
 import MovieCard from "../components/MovieCard";
+import SkeletonCard from "../components/SkeletonCard";
 
 function Home() {
   const [movies, setMovies] = useState([]);
@@ -29,8 +30,6 @@ function Home() {
     setLoading(false);
   }
 
-  if (loading) return <p>Loading movies...</p>;
-
   return (
     <div style={{ padding: 20 }}>
 
@@ -40,6 +39,7 @@ function Home() {
           : "🎬 Trending Movies"}
       </h1>
 
+      {/* SEARCH */}
       <input
         value={query}
         onChange={(e) => setQuery(e.target.value)}
@@ -64,6 +64,15 @@ function Home() {
           justifyItems: "center",
         }}
       >
+        {/* LOADING */}
+        {loading
+          ? Array.from({ length: 20 }).map((_, index) => (
+              <SkeletonCard key={index} />
+            ))
+          : movies.map((movie) => (
+              <MovieCard key={movie.id} movie={movie} />
+        ))}
+        {/* MOVIE-CARDS */}
         {movies.map((movie) => (
           <MovieCard key={movie.id} movie={movie} />
         ))}
