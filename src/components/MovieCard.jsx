@@ -1,6 +1,7 @@
 import { useNavigate } from "react-router-dom";
 import { getFavorites, saveFavorites } from "../services/favorites";
 import { useState, useEffect } from "react";
+import { useFavorites } from "../context/FavoritesContext";
 
 function MovieCard({ movie }) {
     const navigate = useNavigate();

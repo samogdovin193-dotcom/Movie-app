@@ -5,62 +5,164 @@ import { getMovieDetails, getMovieVideos, getMovieCredits, getSimilarMovies } fr
 function MovieDetails() {
     const { id } = useParams();
     const navigate = useNavigate();
+
     const [movie, setMovie] = useState(null);
     const [loading, setLoading] = useState(true);
     const [videoKey, setVideoKey] = useState(null);
     const [videoType, setVideoType] = useState(null);
     const [cast, setCast] = useState([]);
     const [similar, setSimilar] = useState([]);
+    const [error, setError] = useState(null);
 
     useEffect(() => {
-        async function fetchMovie() {
-            try {
-                setLoading(true);
+    let isMounted = true;
 
-                const movieData = await getMovieDetails(id);
-                setMovie(movieData);
+    const fetchMovie = async () => {
+        console.log("FETCH START - id:", id);
 
-                const videoData = await getMovieVideos(id);
-            
-                // Filter only Youtube videos
-                const videos = videoData.results.filter(v => v.site === "YouTube");
+        setLoading(true);
+        setError(null);
 
-                // priority: Trailer → Teaser
-                const trailer =
-                    videos.find((v) => v.type === "Trailer") ||
-                    videos.find((v) => v.type === "Teaser");
+        try {
+            const [movieData, videoData, creditsData, similarData] = await Promise.all([
+                    getMovieDetails(id),
+                    getMovieVideos(id),
+                    getMovieCredits(id),
+                    getSimilarMovies(id)
+                ]);
 
-                if (trailer) {
-                    setVideoKey(trailer.key);
-                    setVideoType(trailer.type);
-                } else {
-                    setVideoKey(null);
-                    setVideoType(null);
-                }
+            if (!isMounted) return;
 
-                const creditsData = await getMovieCredits(id);
-                // Only top actors
-                setCast(creditsData.cast.slice(0, 8));
+            console.log("Data loaded successfully");
 
-                const similarData = await getSimilarMovies(id);
-                // Only top 10 searches
-                setSimilar((similarData.results || []).slice(0, 10));
+            setMovie(movieData);
 
-            } catch (error) {
-                console.error("MovieDetails error:", error);
+            // VIDEOS
+            const videos = videoData.results.filter(v => v.site === "YouTube");
+            const trailer =
+                videos.find(v => v.type === "Trailer") ||
+                videos.find(v => v.type === "Teaser");
 
+            setVideoKey(trailer?.key || null);
+            setVideoType(trailer?.type || null);
+
+            // CAST AND SIMILAR
+            setCast(creditsData.cast.slice(0, 8));
+            setSimilar((similarData.results || []).slice(0, 10));
+
+        } catch (error) {
+            console.error("MovieDetails error:", error);
+            if (isMounted) {
+                setError("Failed to load movie details");
                 setMovie(null);
-                setVideoKey(null);
-                setCast([]);
-            } finally {
+            }
+        } finally {
+            console.log("FINALLY - setting loading false");
+            if (isMounted) {
                 setLoading(false);
             }
         }
+    }
 
-        fetchMovie();
-    }, [id]);
+    fetchMovie();
 
-    if (loading) return <p>Loading movie...</p>;
+    return () => {
+        isMounted = false;
+    };
+}, [id]);
+
+    if (loading) {
+        console.log("SHOWING LOADING SKELETON");
+        return (
+            <div>
+            <div 
+                style={{ 
+                    padding: 40, 
+                    maxWidth: "1200px",
+                    width: "65%",
+                    margin: "0 auto",
+                    marginTop: 30,
+                    minHeight: "40vh",
+                    backgroundColor: "#252525"
+                }}>
+
+                {/* Title */}
+                <div style={{
+                    height: 48,
+                    width: "55%",
+                    backgroundColor: "#383838",
+                    borderRadius: 8,
+                    marginTop: 40,
+                    marginBottom: 20,
+                    animation: "pulse 1.5s infinite"
+                }} />
+
+                {/* Stats */}
+                <div style={{
+                    height: 32,
+                    width: "30%",
+                    backgroundColor: "#383838",
+                    borderRadius: 6,
+                    marginBottom: 30,
+                    animation: "pulse 1.5s infinite"
+                }} />
+
+                {/* Overview lines */}
+                <div style={{
+                    height: 24,
+                    width: "55%",
+                    backgroundColor: "#383838",
+                    borderRadius: 6,
+                    marginBottom: 12,
+                    animation: "pulse 1.5s infinite"
+                }} />
+                <div style={{
+                    height: 24,
+                    width: "52%",
+                    backgroundColor: "#383838",
+                    borderRadius: 6,
+                    marginBottom: 12,
+                    animation: "pulse 1.5s infinite"
+                }} />
+                <div style={{
+                    height: 24,
+                    width: "40%",
+                    backgroundColor: "#383838",
+                    borderRadius: 6,
+                    animation: "pulse 1.5s infinite"
+                }} />
+            </div>
+                {/* TRAILER */}
+                <div 
+                style={{ 
+                    padding: 40, 
+                    maxWidth: "1200px",
+                    width: "65%",
+                    margin: "0 auto",
+                    marginTop: 30,
+                    minHeight: "35vh",
+                    backgroundColor: "#252525"
+                }}>
+                    {/* Title */}
+                    <div style={{
+                    height: 40,
+                    width: "70%",
+                    backgroundColor: "#383838",
+                    borderRadius: 8,
+                    animation: "pulse 1.5s infinite"
+                }} />
+                </div>
+            </div>
+        );
+    }
+
+    if (error) {
+        return <div style={{ padding: 40, textAlign: "center", color: "red" }}>{error}</div>;
+    }
+
+    if (!movie) {
+        return <div>Movie not found</div>;
+    }
 
     return (
         <div style={{ padding: 20, maxWidth: 800, margin: "0 auto" }}>
@@ -69,10 +171,10 @@ function MovieDetails() {
             <div
                 style={{
                     position: "relative",
-                    height: "450px",
-                    backgroundImage: movie.backdrop_path
+                    height: "auto",
+                    backgroundImage: movie?.backdrop_path
                         ? `url(https://image.tmdb.org/t/p/original${movie.backdrop_path})`
-                        : "none",
+                        : "linear-gradient(#111, #333)",
                     backgroundSize: "cover",
                     backgroundPosition: "center",
                     borderRadius: 12,
@@ -103,7 +205,7 @@ function MovieDetails() {
                     <button
                         onClick={() => navigate(-1)}
                         style={{
-                            marginBottom: 20,
+                            marginBottom: 0,
                             fontSize: 18,
                             padding: "6px 12px",
                             cursor: "pointer",
@@ -112,7 +214,8 @@ function MovieDetails() {
                         ← Back
                     </button>
 
-                    <h1 style={{ marginBottom: 10, lineHeight: 1.1 }}>
+                    {/* MOVIE INFO */}
+                    <h1 style={{ marginBottom: 10, lineHeight: 1.0 }}>
                         {movie.title}
                     </h1>
 
@@ -122,6 +225,12 @@ function MovieDetails() {
 
                     <p style={{ marginTop: 10 }}>
                         📅 {movie.release_date}
+                    </p>
+
+                    <p style={{ marginTop: 10 }}>
+                        ⏱️ {movie.runtime 
+                            ? `${Math.floor(movie.runtime / 60)}h ${movie.runtime % 60}min` 
+                            : "N/A"}
                     </p>
 
                     <p style={{ marginTop: 20, lineHeight: 1.4 }}>

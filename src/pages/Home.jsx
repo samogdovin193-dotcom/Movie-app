@@ -2,12 +2,15 @@ import { useEffect, useState } from "react";
 import { getTrendingMovies, searchMovies } from "../services/tmdb";
 import MovieCard from "../components/MovieCard";
 import SkeletonCard from "../components/SkeletonCard";
+import { useNavigate } from "react-router-dom";
+import { getFavorites } from "../services/favorites";
 
 function Home() {
   const [movies, setMovies] = useState([]);
   const [loading, setLoading] = useState(true);
   const [query, setQuery] = useState("");
   const [searchTerm, setSearchTerm] = useState("");
+  const navigate = useNavigate();
 
   useEffect(() => {
     loadMovies();
@@ -38,6 +41,30 @@ function Home() {
           ? `Search results for "${searchTerm}"`
           : "🎬 Trending Movies"}
       </h1>
+
+      {/* FAVORITES BUTTON */}
+      <button 
+        onClick={() => navigate("/favorites")}
+        style={{
+            position: "absolute",
+            top: "20px",
+            right: "20px",
+            padding: "10px 20px",
+            fontSize: "1.1rem",
+            backgroundColor: "#e63939",
+            color: "white",
+            border: "none",
+            borderRadius: 8,
+            cursor: "pointer",
+            zIndex: 10,
+            display: "flex",
+            alignItems: "center",
+            gap: "8px",
+            boxShadow: "0 4px 12px rgba(0,0,0,0.2)"
+        }}
+      >
+        ❤️ Favorites ({getFavorites().length})
+      </button>
 
       {/* SEARCH */}
       <input
@@ -72,12 +99,7 @@ function Home() {
           : movies.map((movie) => (
               <MovieCard key={movie.id} movie={movie} />
         ))}
-        {/* MOVIE-CARDS */}
-        {movies.map((movie) => (
-          <MovieCard key={movie.id} movie={movie} />
-        ))}
       </div>
-
     </div>
   );
 }
