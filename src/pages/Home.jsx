@@ -13,6 +13,7 @@ function Home() {
   const { favorites } = useFavorites();
   const navigate = useNavigate();
   const [sortBy, setSortBy] = useState("popularity");
+  const [selectedGenre, setSelectedGenre] = useState("all");
 
   useEffect(() => {
     loadMovies();
@@ -35,7 +36,28 @@ function Home() {
     setLoading(false);
   }
 
-  const sortedMovies = [...movies].sort((a, b) => {
+  const genres = {
+    28: "Action",
+    12: "Adventure",
+    16: "Animation",
+    35: "Comedy",
+    80: "Crime",
+    18: "Drama",
+    10751: "Family",
+    14: "Fantasy",
+    27: "Horror",
+    9648: "Mystery",
+    878: "Sci-Fi",
+    53: "Thriller",
+  };
+  
+  const filteredMovies = movies.filter((movie) => {
+    if (selectedGenre === "all") return true;
+
+    return movie.genre_ids?.includes(Number(selectedGenre));
+  });
+
+  const sortedMovies = [...filteredMovies].sort((a, b) => {
     switch (sortBy) {
       case "rating":
         return b.vote_average - a.vote_average;
@@ -89,6 +111,11 @@ function Home() {
       <input
         value={query}
         onChange={(e) => setQuery(e.target.value)}
+        style={{
+          marginTop: 15,
+          marginLeft: 10,
+          padding: "8px",
+        }}
         onKeyDown={(e) => {
           if (e.key === "Enter") {
             loadMovies(query);
@@ -97,22 +124,45 @@ function Home() {
         placeholder="Search movies..."
       />
 
-      <button onClick={() => loadMovies(query)}>
+      <button onClick={() => loadMovies(query)} 
+        style={{
+          marginLeft: 10,
+          padding: "8px",
+        }}>
         Search
       </button>
 
+      {/* SORT */}
       <select
         value={sortBy}
         onChange={(e) => setSortBy(e.target.value)}
         style={{
-            marginLeft: 10,
-            padding: "8px",
+          marginLeft: 10,
+          padding: "8px",
         }}
       >
         <option value="popularity">Popularity</option>
         <option value="rating">Rating</option>
         <option value="release">Release Date</option>
         <option value="title">Title A-Z</option>
+      </select>
+
+      {/* FILTER */}
+      <select
+        value={selectedGenre}
+        onChange={(e) => setSelectedGenre(e.target.value)}
+        style={{
+            marginLeft: 10,
+            padding: "8px",
+        }}
+      >
+        <option value="all">All Genres</option>
+
+        {Object.entries(genres).map(([id, name]) => (
+          <option key={id} value={id}>
+            {name}
+          </option>
+        ))}
       </select>
 
       <div
