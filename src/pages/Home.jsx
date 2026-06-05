@@ -30,25 +30,26 @@ function Home() {
   }, [urlQuery, selectedGenre, sortBy, page]);
 
   async function loadMovies() {
-  setLoading(true);
+    setLoading(true);
 
-  let data;
+    let data;
 
-  if (urlQuery) {
-    data = await searchMovies(urlQuery, page);
-  } else {
-    data = await discoverMovies({
-      genreId: selectedGenre,
-      sortBy: sortMap[sortBy],
-      page,
-    });
+    if (urlQuery) {
+      data = await searchMovies(urlQuery, page);
+      data.results = sortResults(data.results, sortBy);
+    } else {
+      data = await discoverMovies({
+        genreId: selectedGenre,
+        sortBy: sortMap[sortBy],
+        page,
+      });
+    }
+
+    setMovies(data.results || []);
+    setTotalPages(data.total_pages || 1);
+
+    setLoading(false);
   }
-
-  setMovies(data.results || []);
-  setTotalPages(data.total_pages || 1);
-
-  setLoading(false);
-}
 
 const sortMap = {
   popularity: "popularity.desc",
@@ -56,6 +57,29 @@ const sortMap = {
   release: "release_date.desc",
   title: "original_title.asc",
 };
+
+function sortResults(list, sortBy) {
+  const sorted = [...list];
+
+  switch (sortBy) {
+    case "rating":
+      return sorted.sort((a, b) => b.vote_average - a.vote_average);
+
+    case "release":
+      return sorted.sort(
+        (a, b) => new Date(b.release_date) - new Date(a.release_date)
+      );
+
+    case "title":
+      return sorted.sort((a, b) =>
+        a.title.localeCompare(b.title)
+      );
+
+    case "popularity":
+    default:
+      return sorted.sort((a, b) => b.popularity - a.popularity);
+  }
+}
 
   const genres = {
     28: "Action",
@@ -225,11 +249,14 @@ const sortMap = {
               <MovieCard key={movie.id} movie={movie} />
         ))}
       </div>
+      {/* PAGING */}
       <div 
         style={{ 
           marginTop: 20, 
           display: "flex", 
-          gap: 10 
+          gap: 10,
+          justifyContent: "center",
+          alignItems: "center"
           }}
       > 
         <button
