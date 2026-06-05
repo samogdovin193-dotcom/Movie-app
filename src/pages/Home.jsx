@@ -1,40 +1,61 @@
 import { useEffect, useState } from "react";
-import { getTrendingMovies, searchMovies } from "../services/tmdb";
+import { searchMovies, discoverMovies } from "../services/tmdb";
 import MovieCard from "../components/MovieCard";
 import SkeletonCard from "../components/SkeletonCard";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { useFavorites } from "../context/FavoritesContext";
 
 function Home() {
   const [movies, setMovies] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [query, setQuery] = useState("");
-  const [searchTerm, setSearchTerm] = useState("");
+  //const [searchTerm, setSearchTerm] = useState("");
   const { favorites } = useFavorites();
   const navigate = useNavigate();
-  const [sortBy, setSortBy] = useState("popularity");
-  const [selectedGenre, setSelectedGenre] = useState("all");
+  const [searchParams, setSearchParams] = useSearchParams();
+  const page = Number(searchParams.get("page") || 1);
+  const [totalPages, setTotalPages] = useState(1);
+  
+  const sortBy = searchParams.get("sort") || "popularity";
+  const selectedGenre = searchParams.get("genre") || "all";
+  const urlQuery = searchParams.get("q") || "";
+
+  const [query, setQuery] = useState("");
+
+  useEffect(() => {
+    setQuery(urlQuery);
+  }, [urlQuery]);
 
   useEffect(() => {
     loadMovies();
-  }, []);
+  }, [urlQuery, selectedGenre, sortBy, page]);
 
-  async function loadMovies(searchQuery = "") {
-    setLoading(true);
+  async function loadMovies() {
+  setLoading(true);
 
-    let data;
+  let data;
 
-    if (searchQuery.trim()) {
-      data = await searchMovies(searchQuery);
-      setSearchTerm(searchQuery);
-    } else {
-      data = await getTrendingMovies();
-      setSearchTerm("");
-    }
-
-    setMovies(data.results || []);
-    setLoading(false);
+  if (urlQuery) {
+    data = await searchMovies(urlQuery, page);
+  } else {
+    data = await discoverMovies({
+      genreId: selectedGenre,
+      sortBy: sortMap[sortBy],
+      page,
+    });
   }
+
+  setMovies(data.results || []);
+  setTotalPages(data.total_pages || 1);
+
+  setLoading(false);
+}
+
+const sortMap = {
+  popularity: "popularity.desc",
+  rating: "vote_average.desc",
+  release: "release_date.desc",
+  title: "original_title.asc",
+};
 
   const genres = {
     28: "Action",
@@ -50,36 +71,58 @@ function Home() {
     878: "Sci-Fi",
     53: "Thriller",
   };
-  
-  const filteredMovies = movies.filter((movie) => {
-    if (selectedGenre === "all") return true;
 
-    return movie.genre_ids?.includes(Number(selectedGenre));
-  });
+  // SEARCH
+  const handleSearch = () => {
+    setSearchParams(prev => {
+      const params = new URLSearchParams(prev);
 
-  const sortedMovies = [...filteredMovies].sort((a, b) => {
-    switch (sortBy) {
-      case "rating":
-        return b.vote_average - a.vote_average;
+      if (query.trim()) {
+        params.set("q", query);
+        params.set("genre", "all");
+      } else {
+        params.delete("q");
+      }
 
-      case "release":
-        return new Date(b.release_date) - new Date(a.release_date);
+      params.set("page", 1);
 
-      case "title":
-        return a.title.localeCompare(b.title);
+      return params;
+    });
+  };
 
-      case "popularity":
-      default:
-        return b.popularity - a.popularity;
-    }
-  });
+  // 🎭 GENRE
+  const handleGenreChange = (e) => {
+    const genre = e.target.value;
+
+    setSearchParams(prev => {
+      const params = new URLSearchParams(prev);
+
+      params.set("genre", genre);
+      params.set("page", 1);
+      params.delete("q");
+
+      return params;
+    });
+  };
+
+  // 📊 SORT
+  const handleSortChange = (e) => {
+    const sort = e.target.value;
+
+    setSearchParams(prev => {
+      const params = new URLSearchParams(prev);
+      params.set("sort", sort);
+      params.set("page", 1);
+      return params;
+    });
+  };
 
   return (
     <div style={{ padding: 20 }}>
 
       <h1>
-        {searchTerm
-          ? `Search results for "${searchTerm}"`
+        {urlQuery
+          ? `Search results for "${urlQuery}"`
           : "🎬 Trending Movies"}
       </h1>
 
@@ -117,14 +160,13 @@ function Home() {
           padding: "8px",
         }}
         onKeyDown={(e) => {
-          if (e.key === "Enter") {
-            loadMovies(query);
-          }
+          if (e.key === "Enter") 
+            handleSearch();
         }}
         placeholder="Search movies..."
       />
 
-      <button onClick={() => loadMovies(query)} 
+      <button onClick={handleSearch} 
         style={{
           marginLeft: 10,
           padding: "8px",
@@ -135,7 +177,7 @@ function Home() {
       {/* SORT */}
       <select
         value={sortBy}
-        onChange={(e) => setSortBy(e.target.value)}
+        onChange={handleSortChange}
         style={{
           marginLeft: 10,
           padding: "8px",
@@ -150,7 +192,7 @@ function Home() {
       {/* FILTER */}
       <select
         value={selectedGenre}
-        onChange={(e) => setSelectedGenre(e.target.value)}
+        onChange={handleGenreChange}
         style={{
             marginLeft: 10,
             padding: "8px",
@@ -179,9 +221,44 @@ function Home() {
           ? Array.from({ length: 20 }).map((_, index) => (
               <SkeletonCard key={index} />
             ))
-          : sortedMovies.map((movie) => (
+          : movies.map((movie) => (
               <MovieCard key={movie.id} movie={movie} />
         ))}
+      </div>
+      <div 
+        style={{ 
+          marginTop: 20, 
+          display: "flex", 
+          gap: 10 
+          }}
+      > 
+        <button
+          disabled={page <= 1 || loading}
+          onClick={() => {
+            setSearchParams(prev => {
+              const params = new URLSearchParams(prev);
+              params.set("page", page - 1);
+              return params;
+            });
+          }}
+        >
+          ⬅ Prev
+        </button>
+
+        <span>Page {page}</span>
+
+        <button
+          disabled={page >= totalPages || loading}
+          onClick={() => {
+            setSearchParams(prev => {
+              const params = new URLSearchParams(prev);
+              params.set("page", page + 1);
+              return params;
+            });
+          }}
+        >
+          Next ➡
+        </button>
       </div>
     </div>
   );
