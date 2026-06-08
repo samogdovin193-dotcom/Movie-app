@@ -109,18 +109,3 @@ code {
   padding: 4px 8px;
   background: var(--code-bg);
 }
-
-/* Loading animation */
-@keyframes pulse {
-  0% {
-    opacity: 1;
-  }
-
-  50% {
-    opacity: 0.6;
-  }
-
-  100% {
-    opacity: 1;
-  }
-}

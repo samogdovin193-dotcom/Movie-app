@@ -2,39 +2,27 @@ import { useNavigate } from "react-router-dom";
 import MovieCard from "../components/MovieCard";
 import SkeletonCard from "../components/SkeletonCard";
 import { useFavorites } from "../context/FavoritesContext";
+import "./Favorites.css";
 
 function Favorites() {
     const { favorites } = useFavorites();
     const navigate = useNavigate();
 
     return (
-        <div style={{ padding: 20 }}>
-            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 30 }}>
+        <div className="favorites-page">
+            <div className="favorites-header">
                 <h1>❤️ My Favorites ({favorites.length})</h1>
                 <button 
                     onClick={() => navigate(-1)} 
-                    style={{ padding: "8px 18px", fontSize: "1rem" }}
+                    className="favorites-back-button"
                 >
                     ← Back
                 </button>
             </div>
 
-            <div
-                style={{
-                    display: "grid",
-                    gridTemplateColumns: "repeat(auto-fill, minmax(180px, 1fr))",
-                    gap: 20,
-                    justifyItems: "center",
-                }}
-            >
+            <div className="favorites-grid">
                 {favorites.length === 0 ? (
-                    <div style={{ 
-                        gridColumn: "1 / -1",
-                        textAlign: "center", 
-                        padding: 100, 
-                        color: "#888",
-                        fontSize: "1.3rem"
-                    }}>
+                    <div className="favorites-empty">
                         <p>You don't have any favorite movies yet.</p>
                         <p>Go back and click the ❤️ on movies you like!</p>
                     </div>

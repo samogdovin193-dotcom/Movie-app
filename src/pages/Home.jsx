@@ -4,11 +4,11 @@ import MovieCard from "../components/MovieCard";
 import SkeletonCard from "../components/SkeletonCard";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { useFavorites } from "../context/FavoritesContext";
+import "./Home.css";
 
 function Home() {
   const [movies, setMovies] = useState([]);
   const [loading, setLoading] = useState(true);
-  //const [searchTerm, setSearchTerm] = useState("");
   const { favorites } = useFavorites();
   const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
@@ -29,6 +29,7 @@ function Home() {
     loadMovies();
   }, [urlQuery, selectedGenre, sortBy, page]);
 
+  // LOADING MOVIES
   async function loadMovies() {
     setLoading(true);
 
@@ -51,36 +52,39 @@ function Home() {
     setLoading(false);
   }
 
-const sortMap = {
-  popularity: "popularity.desc",
-  rating: "vote_average.desc",
-  release: "release_date.desc",
-  title: "original_title.asc",
-};
+  // SORT MAP
+  const sortMap = {
+    popularity: "popularity.desc",
+    rating: "vote_average.desc",
+    release: "release_date.desc",
+    title: "original_title.asc",
+  };
 
-function sortResults(list, sortBy) {
-  const sorted = [...list];
+  // SORTING
+  function sortResults(list, sortBy) {
+    const sorted = [...list];
 
-  switch (sortBy) {
-    case "rating":
-      return sorted.sort((a, b) => b.vote_average - a.vote_average);
+    switch (sortBy) {
+      case "rating":
+        return sorted.sort((a, b) => b.vote_average - a.vote_average);
 
-    case "release":
-      return sorted.sort(
-        (a, b) => new Date(b.release_date) - new Date(a.release_date)
-      );
+      case "release":
+        return sorted.sort(
+          (a, b) => new Date(b.release_date) - new Date(a.release_date)
+        );
 
-    case "title":
-      return sorted.sort((a, b) =>
-        a.title.localeCompare(b.title)
-      );
+      case "title":
+        return sorted.sort((a, b) =>
+          a.title.localeCompare(b.title)
+        );
 
-    case "popularity":
-    default:
-      return sorted.sort((a, b) => b.popularity - a.popularity);
+      case "popularity":
+      default:
+        return sorted.sort((a, b) => b.popularity - a.popularity);
+    }
   }
-}
 
+  // GENRE MAPPING
   const genres = {
     28: "Action",
     12: "Adventure",
@@ -142,7 +146,7 @@ function sortResults(list, sortBy) {
   };
 
   return (
-    <div style={{ padding: 20 }}>
+    <div className="home-container">
 
       <h1>
         {urlQuery
@@ -153,23 +157,7 @@ function sortResults(list, sortBy) {
       {/* FAVORITES BUTTON */}
       <button 
         onClick={() => navigate("/favorites")}
-        style={{
-            position: "absolute",
-            top: "20px",
-            right: "20px",
-            padding: "10px 20px",
-            fontSize: "1.1rem",
-            backgroundColor: "#e63939",
-            color: "white",
-            border: "none",
-            borderRadius: 8,
-            cursor: "pointer",
-            zIndex: 10,
-            display: "flex",
-            alignItems: "center",
-            gap: "8px",
-            boxShadow: "0 4px 12px rgba(0,0,0,0.2)"
-        }}
+        className="favorites-button"
       >
         ❤️ Favorites ({favorites.length})
       </button>
@@ -178,11 +166,7 @@ function sortResults(list, sortBy) {
       <input
         value={query}
         onChange={(e) => setQuery(e.target.value)}
-        style={{
-          marginTop: 15,
-          marginLeft: 10,
-          padding: "8px",
-        }}
+        className="search-input"
         onKeyDown={(e) => {
           if (e.key === "Enter") 
             handleSearch();
@@ -190,11 +174,10 @@ function sortResults(list, sortBy) {
         placeholder="Search movies..."
       />
 
-      <button onClick={handleSearch} 
-        style={{
-          marginLeft: 10,
-          padding: "8px",
-        }}>
+      <button 
+        onClick={handleSearch} 
+        className="button_and_select"
+      >
         Search
       </button>
 
@@ -202,10 +185,7 @@ function sortResults(list, sortBy) {
       <select
         value={sortBy}
         onChange={handleSortChange}
-        style={{
-          marginLeft: 10,
-          padding: "8px",
-        }}
+        className="button_and_select"
       >
         <option value="popularity">Popularity</option>
         <option value="rating">Rating</option>
@@ -217,10 +197,7 @@ function sortResults(list, sortBy) {
       <select
         value={selectedGenre}
         onChange={handleGenreChange}
-        style={{
-            marginLeft: 10,
-            padding: "8px",
-        }}
+        className="button_and_select"
       >
         <option value="all">All Genres</option>
 
@@ -231,15 +208,7 @@ function sortResults(list, sortBy) {
         ))}
       </select>
 
-      <div
-        style={{
-          display: "grid",
-          gridTemplateColumns: "repeat(auto-fill, minmax(180px, 1fr))",
-          gap: 10,
-          marginTop: 20,
-          justifyItems: "center",
-        }}
-      >
+      <div className="movies-grid">
         {/* LOADING */}
         {loading
           ? Array.from({ length: 20 }).map((_, index) => (
@@ -250,15 +219,7 @@ function sortResults(list, sortBy) {
         ))}
       </div>
       {/* PAGING */}
-      <div 
-        style={{ 
-          marginTop: 20, 
-          display: "flex", 
-          gap: 10,
-          justifyContent: "center",
-          alignItems: "center"
-          }}
-      > 
+      <div className="pagination"> 
         <button
           disabled={page <= 1 || loading}
           onClick={() => {

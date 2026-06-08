@@ -1,0 +1,163 @@
+.loading-container {
+  padding: 40px;
+  max-width: 1200px;
+  width: 65%;
+  margin: 30px auto 0;
+  background-color: #252525;
+  min-height: 40vh;
+}
+
+/* SKELETON */
+.skeleton-box {
+  background-color: #383838;
+  border-radius: 8px;
+  animation: pulse 1.5s infinite;
+}
+
+.skeleton-title { width: 55%; height: 48px; margin-top: 40px; margin-bottom: 20px; }
+.skeleton-subtitle { width: 30%; height: 32px; margin-bottom: 30px; }
+.skeleton-line { height: 24px; margin-bottom: 12px; }
+
+.movie-details {
+  padding: 20px;
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.loading-trailer {
+  padding: 40px;
+  max-width: 1200px;
+  width: 65%;
+  margin: 0 auto;
+  margin-top: 70px;
+  min-height: 35vh;
+  background-color: #252525;
+}
+
+/* HERO */
+.hero {
+  position: relative;
+  height: auto;
+  border-radius: 12px;
+  overflow: hidden;
+  margin-bottom: 30px;
+  background-size: cover;
+  background-position: center;
+}
+
+.hero-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to right, rgba(0,0,0,0.85), rgba(0,0,0,0.3));
+}
+
+.hero-content {
+  position: relative;
+  color: white;
+  padding: 30px;
+  max-width: 60%;
+}
+
+/* BUTTON */
+.back-button {
+  font-size: 18px;
+  padding: 6px 12px;
+  cursor: pointer;
+  margin-bottom: 0px;
+}
+
+/* SECTION */
+.section {
+  margin-top: 30px;
+}
+
+/* TRAILER */
+.trailer {
+  width: 100%;
+  height: 400px;
+  border: none;
+  margin-top: 10px;
+}
+
+.no-trailer {
+  padding: 20px;
+  background-color: #f5f5f5;
+  border-radius: 10px;
+  text-align: center;
+  margin-top: 10px;
+}
+
+/* CAST */
+.cast-container {
+  display: flex;
+  gap: 15px;
+  overflow-x: auto;
+  padding-bottom: 10px;
+}
+
+.cast-card {
+  min-width: 120px;
+  text-align: center;
+}
+
+.cast-image {
+  width: 120px;
+  height: 180px;
+  object-fit: cover;
+  border-radius: 10px;
+}
+
+.cast-actor {
+  font-size: 15px;
+  margin-top: 5;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.cast-character {
+  font-size: 14px;
+  color: gray;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* SIMILAR */
+.similar-container {
+  display: flex;
+  gap: 15px;
+  overflow-x: auto;
+  padding-bottom: 10px;
+}
+
+.similar-card {
+  min-width: 140px;
+  text-align: center;
+  cursor: pointer;
+  transition: transform 0.25s ease;
+}
+
+.similar-card:hover {
+  transform: scale(1.08);
+}
+
+.similar-card img {
+  width: 140px;
+  height: 210px;
+  object-fit: cover;
+  border-radius: 10px;
+}
+
+.similar-title {
+  font-size: 13px;
+  margin-top: 5px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* ERROR */
+.error {
+  padding: 40px;
+  text-align: center;
+  color: red;
+}
