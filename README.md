@@ -122,7 +122,7 @@ Favorites are managed using React Context and stored locally in memory (can be e
 
 ## 🌍 Live Demo
 
-👉 [Live Demo](https://movie-app-coral-delta.vercel.app/)
+👉 [Movie App](https://movie-app-coral-delta.vercel.app/)
 
 ## 👨‍💻 Author
 
