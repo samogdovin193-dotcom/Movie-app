@@ -32,45 +32,53 @@ A React-based movie browsing application that uses the TMDB API to search, disco
 
 ## 📁 Project Structure
 
+```bash
 src/
 ├── components/
-│ ├── MovieCard.jsx
-│ ├── MovieCard.css
-│ ├── SkeletonCard.jsx
-│ ├── SkeletonCard.css
+│   ├── MovieCard.jsx
+│   ├── MovieCard.css
+│   ├── SkeletonCard.jsx
+│   ├── SkeletonCard.css
 │
 ├── context/
-│ ├── FavoritesContext.jsx
+│   ├── FavoritesContext.jsx
 │
 ├── pages/
-│ ├── Home.jsx
-│ ├── Home.css
-│ ├── MovieDetails.jsx
-│ ├── MovieDetails.css
-│ ├── Favorites.jsx
-│ ├── Favorites.css
+│   ├── Home.jsx
+│   ├── Home.css
+│   ├── MovieDetails.jsx
+│   ├── MovieDetails.css
+│   ├── Favorites.jsx
+│   ├── Favorites.css
 │
 ├── services/
-│ ├── tmdb.js
-│ ├── favorites.js
+│   ├── tmdb.js
+│   ├── favorites.js
 │
 ├── App.jsx
 ├── App.css
 └── main.jsx
+```
 
 ## ⚙️ Setup & Installation
 
 1. Clone the repo
-   git clone https://github.com/samogdovin193-dotcom/Movie-app
+
+   ```bash
+   git clone https://github.com/samogdovin193-dotcom/Movie-app.git
    cd Movie-app
+   ```
 
 2. Install dependencies
+
    npm install
 
 3. Add TMDB API key
+
    VITE_TMDB_API_KEY=your_api_key_here
 
 4. Run the app
+
    npm run dev
 
 ## 🔑 API Used
