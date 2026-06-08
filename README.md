@@ -71,7 +71,9 @@ src/
 
 2. Install dependencies
 
+   ```bash
    npm install
+   ```
 
 3. Add TMDB API key
 
@@ -79,7 +81,9 @@ src/
 
 4. Run the app
 
+   ```bash
    npm run dev
+   ```
 
 ## 🔑 API Used
 
