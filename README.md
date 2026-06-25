@@ -126,7 +126,7 @@ Favorites are managed using React Context and stored locally in memory (can be e
 
 ## 👨‍💻 Author
 
-Built by Samuel Gdovin.
+Built by Ing. Samuel Gdovin.
 A frontend developer focused on learning React through real-world projects.
 
 ## 📄 License
